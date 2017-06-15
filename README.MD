@@ -28,6 +28,10 @@ Consider this example: user registration. Suppose we have a REST request from a 
 In this embodiment, the *service layer* is *«controllers»*, the *business layer* is *«repositories»* and *data layer is «models»*
 ## Used libs
 Use [dynamic-config](https://github.com/peerigon/dynamic-config) for config enviroment.
+[Express](https://github.com/expressjs/express) as web framework for [node](https://nodejs.org/en/).
+[TypeScript](https://github.com/Microsoft/TypeScript) as language for application-scale JavaScript.
+[JWT](https://jwt.io) for user authorization.
+[Mocha](https://mochajs.org)[Chai](http://chaijs.com) for testing, also [Chai-http](https://github.com/chaijs/chai-http) for integration test.
 
 ## Installation
 Make git clone or zip download and move to the directory
