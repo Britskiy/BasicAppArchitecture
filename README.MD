@@ -26,6 +26,8 @@ Consider this example: user registration. Suppose we have a REST request from a 
 **Data layer**: performs CRUD operations so that receives from business layer. 
 
 In this embodiment, the *service layer* is *«controllers»*, the *business layer* is *«repositories»* and *data layer is «models»*
+## Used libs
+Use [dynamic-config](https://github.com/peerigon/dynamic-config) for config enviroment.
 
 ## Installation
 Make git clone or zip download and move to the directory
@@ -38,9 +40,6 @@ Use mocha, chai and chai-http for test.
 ```
 gulp test
 ```
-## Contributors
-
-Let people know how they can dive into the project, include important links to things like issue trackers, irc, twitter accounts if applicable.
 
 ## License
 MIT License
