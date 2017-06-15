@@ -40,6 +40,7 @@ Use mocha, chai and chai-http for test.
 ```
 gulp test
 ```
+![alt text](https://image.ibb.co/bs1e3Q/Tests.png)
 ## Contributors
 
 This code is implemented model of the user including the CRUD operations and authorization based on token jwt and of course it is accompanied by tests.
