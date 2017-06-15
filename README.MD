@@ -20,10 +20,10 @@ Consider this example: user registration. Suppose we have a REST request from a 
 - **Data layer** just manages preservation / creation and other methods and do not know anything about the data itself. 
 
 ![alt text](https://image.ibb.co/hyoHOQ/Main.png)
-*Summarize it in a VERY simplified form*
-**Service layer**: clears the data and generates a response from the business layer 
-**Business layer**: performs all data manipulation: the criterion sampling, filters and other "business objectives". 
-**Data layer**: performs CRUD operations so that receives from business layer. 
+*Summarize it in a VERY simplified form*<br />
+**Service layer**: clears the data and generates a response from the business layer. <br />
+**Business layer**: performs all data manipulation: the criterion sampling, filters and other "business objectives". <br />
+**Data layer**: performs CRUD operations so that receives from business layer. <br />
 
 In this embodiment, the *service layer* is *«controllers»*, the *business layer* is *«repositories»* and *data layer is «models»*
 ## Used libs
