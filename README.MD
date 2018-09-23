@@ -1,7 +1,7 @@
 ## Changelog
 
 **(23.09.2018)**
-- Update all package versions and fix it 
+- Update all packages versions and fix it 
 - Update source code for working with latest packages 
 
 ## Attempt to implement the correct application architecture
