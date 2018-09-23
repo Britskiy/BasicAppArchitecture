@@ -26,7 +26,7 @@ export class UserModel {
     }
 
     static create(data: IUser): Promise<IUser> {
-        let promise = new Promise((resolve, reject) => {
+        return new Promise((resolve, reject) => {
             let repo = new UserRepository();
             let user = <IUser>{
                 login: data.login,
@@ -46,12 +46,10 @@ export class UserModel {
                 }
             });
         });
-
-        return promise;
     }
 
     static getPublicInfo(_id: ObjectId): Promise<IUser> {
-        let promise = new Promise((resolve, reject) => {
+        return new Promise((resolve, reject) => {
             let repo = new UserRepository();
             repo.findOne({ _id: _id })
                 .select('firstName lastName login -_id')
@@ -64,11 +62,10 @@ export class UserModel {
                     }
                 });
         });
-        return promise;
     }
 
     static auth(login: string, password: string): Promise<String> {
-        let promise = new Promise((resolve, reject) => {
+       return new Promise((resolve, reject) => {
             let repo = new UserRepository();
             repo.findOne({ login: login })
                 .select('password')
@@ -92,11 +89,10 @@ export class UserModel {
                     }
                 });
         });
-        return promise;
     }
 
     static update(data: any): Promise<String> {
-        let promise = new Promise((resolve, reject) => {
+        return new Promise((resolve: any, reject) => {
             let repo = new UserRepository();
             repo.findOne({ _id: data._id })
                 .select('firstName lastName _id')
@@ -116,24 +112,21 @@ export class UserModel {
                     }
                 });
         });
-        return promise;
     }
 
     static delete(_id: string): Promise<String> {
-        let promise = new Promise((resolve, reject) => {
+        return new Promise((resolve, reject) => {
             let repo = new UserRepository();
             repo.delete(_id, (err, result) => {
-                console.log(err, result);
                 if (err)
                     return reject(err);
                 return resolve(result);
             })
         });
-        return promise;
     }
 
     static deleteWithPasswordChecking(password, _id: string): Promise<String> {
-        let promise = new Promise((resolve, reject) => {
+        return new Promise((resolve: any, reject) => {
             let repo = new UserRepository();
 
             repo.findOne({ _id: _id })
@@ -157,7 +150,6 @@ export class UserModel {
                     }
                 });
         });
-        return promise;
     }
 }
 

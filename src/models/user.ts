@@ -32,7 +32,7 @@ let User = new Schema({
 
 // Bcrypt middleware on UserSchema
 User.pre('save', function(next) {
-    var user = this;
+    var user:IUser = (<IUser>this);
     if (!user.isModified('password')) return next();
 
     bcrypt.genSalt(config.SALT_WORK_FACTOR, (err, salt) => {

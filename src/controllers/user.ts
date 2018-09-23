@@ -131,7 +131,7 @@ router.get('/logout', jwt({ secret: config.secretToken }), (req, res) => {
 
 //Get public info
 router.get('/:id', (req, res) => {
-    req.checkParams('id', 'Invalid ID param').notEmpty().isObjectId();
+    //req.checkParams('id', 'Invalid ID param').notEmpty().isObjectId();
     req.getValidationResult().then((result) => {
         if (!result.isEmpty()) {
             return res.status(400).send({ result: result.array(), isError: true });
