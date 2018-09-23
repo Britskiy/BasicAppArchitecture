@@ -9,11 +9,9 @@ export class DataBase {
         (<any>mongoose).Promise = global.Promise;
 
         if (mongoose.connection.readyState == 0) {
-            console.log(1);
-            //https://github.com/louy/typed-mongoose/issues/4
-            //mongoose.Promise = global.Promise;
-            //(<any>mongoose).Promise = global.Promise;
             mongoose.set('debug', config.debug);
+            mongoose.set('useCreateIndex', true);
+            mongoose.set('useNewUrlParser', true);
             this.connection = mongoose.connect(config.mongoDB);
         }
         else
