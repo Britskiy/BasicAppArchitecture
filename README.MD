@@ -1,8 +1,12 @@
 ## Changelog
 
 **(23.09.2018)**
-- Update all packages versions and fix it 
+- Update all packages (except: mocha/chai/chai-http/brypt - not stable work) versions and fix it 
 - Update source code for working with latest packages 
+
+## TODO: 
+- Test and implement most newest and stable (real stable) mocha/chai/chai-http/brypt
+
 
 ## Attempt to implement the correct application architecture
 This example represents one possible implementation of a business logic layer, and serve as the starting point in the training of forming the project structure.
