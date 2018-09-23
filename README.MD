@@ -1,3 +1,9 @@
+## Changelog
+
+**(23.09.2018)**
+- Update all package versions and fix it 
+- Update source code for working with latest packages 
+
 ## Attempt to implement the correct application architecture
 This example represents one possible implementation of a business logic layer, and serve as the starting point in the training of forming the project structure.
 
