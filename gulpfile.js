@@ -5,7 +5,6 @@ const typescript = require('gulp-typescript');
 const DEBUG = process.env.NODE_ENV === 'debug',
     CI = process.env.CI === 'true';
 
-//var mocha = require('gulp-mocha');
 var mocha = require('gulp-spawn-mocha');
 var gutil = require('gulp-util');
 
@@ -21,6 +20,7 @@ let config = {
         "sourceMap": true,
         "rootDir": ".",
         "allowJs": true,
+        "typeRoots": ["src/typings"],
         "types": [ "node" ]
     }
 }
@@ -59,6 +59,7 @@ gulp.task('tests', function() {
             .pipe(gulp.dest('./test/'))
             .pipe(mocha({
                 debugBrk: DEBUG,
+                exit: true,
                 env: { 'NODE_ENV': 'test' },
                 reporter: 'spec'
         })).on('error', handleError).on('end', function() {
@@ -69,9 +70,6 @@ gulp.task('tests', function() {
 
 // TypeScript compile
 gulp.task('compile', function() {
-   /* gulp.src('src/config/emails/*.hbs')
-        .pipe(gulp.dest('dist/config/emails'));
-*/
     return gulp
         .src('src/**/*.ts')
         .pipe(typescript(config.compilerOptions))
@@ -80,11 +78,6 @@ gulp.task('compile', function() {
 
 // ADD for fix Mocha path
 gulp.task('dist', ['clean', 'clean_src'], function() {
-    //Copy NON compiled handlebars
-    /*
-    gulp.src('src/config/emails/*.hbs')
-        .pipe(gulp.dest('dist/config/emails'));
-    */
     return gulp
         .src('src/**/*.ts')
         .pipe(typescript(config.compilerOptions))

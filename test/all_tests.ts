@@ -105,7 +105,4 @@ describe('User', () => {
                 done();
             });
     });
-
-    after(()=>{ process.exit(); })
 });
-
