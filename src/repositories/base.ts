@@ -3,9 +3,9 @@ import { IRead, IWrite } from '../interfaces/base';
 
 export class RepositoryBase<T extends mongoose.Document> implements IRead<T>, IWrite<T> {
 
-    private _model: mongoose.Model<mongoose.Document>;
+    private _model: mongoose.Model<T>;
 
-    constructor(schemaModel: mongoose.Model<mongoose.Document>) {
+    constructor(schemaModel: mongoose.Model<T>) {
         this._model = schemaModel;
     }
 
@@ -29,11 +29,11 @@ export class RepositoryBase<T extends mongoose.Document> implements IRead<T>, IW
         this._model.findById(_id, callback);
     }
 
-    findOne(cond?: Object, callback?: (err: any, res: T) => void): mongoose.Query<T> {
+    findOne(cond?: Object, callback?: (err: any, res: T) => void): mongoose.DocumentQuery<T,  mongoose.Document> {
         return this._model.findOne(cond, callback);
     }
 
-    find(cond?: Object, fields?: Object, options?: Object, callback?: (err: any, res: T[]) => void): mongoose.Query<T[]> {
+    find(cond?: Object, fields?: Object, options?: Object, callback?: (err: any, res: T[]) => void): mongoose.DocumentQuery<T[],  mongoose.Document> {
         return this._model.find(cond, options, callback);
     }
 
