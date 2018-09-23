@@ -1,4 +1,4 @@
-import chai = require('chai');
+import * as chai from "chai"
 import chaiHttp = require('chai-http');
 import mocha = require('mocha');
 
@@ -11,7 +11,7 @@ let should = chai.should;
 chai.use(chaiHttp);
 
 //Clean
-userSchemaModel.remove({}).exec((data) => { });
+userSchemaModel.deleteMany({}).exec((data) => { });
 
 let errorConvert = (err) => {
     let text = JSON.parse(err.response.error.text);
