@@ -1,5 +1,5 @@
 {
-  "name": "NodeJS - Base Arch",
+  "name": "NodeJS-BaseArch",
   "version": "0.0.2",
   "devDependencies": {
     "@types/gulp": "4.0.5",
