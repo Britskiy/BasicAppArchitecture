@@ -1,11 +1,11 @@
 ## Changelog
 
 **(23.09.2018)**
-- Update all packages (except: mocha/chai/chai-http/brypt - not stable work) versions and fix it 
+- Update all packages (except: mocha/chai/chai-http/bcrypt - not stable work) versions and fix it 
 - Update source code for working with latest packages 
 
 ## TODO: 
-- Test and implement most newest and stable (real stable) mocha/chai/chai-http/brypt
+- Test and implement most newest and stable (real stable) mocha/chai/chai-http/bcrypt
 
 
 ## Attempt to implement the correct application architecture
