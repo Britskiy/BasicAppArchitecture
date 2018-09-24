@@ -20,7 +20,6 @@ let config = {
         "sourceMap": true,
         "rootDir": ".",
         "allowJs": true,
-        "typeRoots": ["src/typings"],
         "types": [ "node" ]
     }
 }

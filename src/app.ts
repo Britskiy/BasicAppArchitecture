@@ -17,13 +17,6 @@ DataBase.connect(config);
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
 
-declare global {
-    namespace ExpressValidator {
-        export interface Validator {
-            isObjectId: () => boolean;
-        }
-    }
-}
 app.use(expressValidator({
     customValidators: {
         isObjectId: (value) => {
