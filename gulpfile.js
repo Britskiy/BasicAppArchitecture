@@ -16,7 +16,8 @@ let config = {
         "module": "commonjs",
         "target": "es6",
         "outDir": "out",
-        "lib": [ "es5","es2015" ],
+        "lib": [ "es5","es2015", "es6",
+        "dom"],
         "sourceMap": true,
         "rootDir": ".",
         "allowJs": true,
@@ -39,14 +40,14 @@ gulp.task('clean_src', function() {
 });
 
 gulp.task('compile-tests-data', function() {
-    gulp.src('./test/data/*.ts', { base: '.' })
+    return gulp.src('./test/data/*.ts', { base: '.' })
         .pipe(typescript(config.compilerOptions))
         .pipe(gulp.dest('.'))
 })
 
 //Mocha tests
 gulp.task('tests', function() {
-    gulp
+    return gulp
         .src('src/**/*.ts')
         .pipe(typescript(config.compilerOptions))
         .pipe(gulp.dest('dist/')).on('end', function() {
@@ -76,14 +77,14 @@ gulp.task('compile', function() {
 });
 
 // ADD for fix Mocha path
-gulp.task('dist', ['clean', 'clean_src'], function() {
+gulp.task('dist', gulp.series('clean', 'clean_src'), function() {
     return gulp
         .src('src/**/*.ts')
         .pipe(typescript(config.compilerOptions))
         .pipe(gulp.dest('dist/'));
 });
 
-gulp.task('test', ['compile-tests-data', 'tests']);
-gulp.task('build', ['compile']);
-gulp.task('default', ['build']);
+gulp.task('test', gulp.series('compile-tests-data', 'tests'));
+gulp.task('build', gulp.series('compile'));
+gulp.task('default', gulp.series('build'));
 //gulp.task('compile', ['handlebars']);
