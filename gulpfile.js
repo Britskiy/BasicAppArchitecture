@@ -1,6 +1,7 @@
 const gulp = require('gulp');
 const del = require('del');
 const typescript = require('gulp-typescript');
+const tsProject = typescript.createProject('tsconfig.json');
 
 const DEBUG = process.env.NODE_ENV === 'debug',
     CI = process.env.CI === 'true';
@@ -40,21 +41,21 @@ gulp.task('clean_src', function() {
 });
 
 gulp.task('compile-tests-data', function() {
-    return gulp.src('./test/data/*.ts', { base: '.' })
+    return tsProject.src()
         .pipe(typescript(config.compilerOptions))
         .pipe(gulp.dest('.'))
 })
 
 //Mocha tests
 gulp.task('tests', function() {
-    return gulp
-        .src('src/**/*.ts')
+    return tsProject
+        .src()
         .pipe(typescript(config.compilerOptions))
-        .pipe(gulp.dest('dist/')).on('end', function() {
+        .pipe(gulp.dest('dist')).on('end', function() {
 
         del('./test/*.js');
 
-        gulp.src('./test/*.ts')
+        tsProject.src()
             .pipe(typescript(config.compilerOptions))
             .pipe(gulp.dest('./test/'))
             .pipe(mocha({
@@ -70,18 +71,14 @@ gulp.task('tests', function() {
 
 // TypeScript compile
 gulp.task('compile', function() {
-    return gulp
-        .src('src/**/*.ts')
-        .pipe(typescript(config.compilerOptions))
-        .pipe(gulp.dest('src/'));
+    return tsProject.src()
+    .pipe(tsProject())
+    .js.pipe(gulp.dest('dist'));
 });
 
 // ADD for fix Mocha path
 gulp.task('dist', gulp.series('clean', 'clean_src'), function() {
-    return gulp
-        .src('src/**/*.ts')
-        .pipe(typescript(config.compilerOptions))
-        .pipe(gulp.dest('dist/'));
+    return tsProject.src().pipe(typescript(config.compilerOptions)).pipe(gulp.dest('dist'));
 });
 
 gulp.task('test', gulp.series('compile-tests-data', 'tests'));
