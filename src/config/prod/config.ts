@@ -1,8 +1,8 @@
 export = {
     whereami: "develop",
-    "site": 'Group images',
+    "site": 'Base Arch',
     "url": 'http://localhost/',
-    "mongoDB": 'mongodb://localhost/groupimages-prod',
+    "mongoDB": 'mongodb://localhost/base-arch-prod',
     "redis_port": 6379,
     "app_port": 3000,
     "socket_port": 3001,
