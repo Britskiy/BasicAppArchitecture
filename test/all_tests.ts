@@ -1,18 +1,17 @@
 import * as chai from "chai"
 import chaiHttp = require('chai-http');
-import mocha = require('mocha');
 
 let server = require('../dist/app');
-import { userSchemaModel } from "../dist/models/user";
+let userModel = require('../dist/models/user');
 import { userData } from "./data/user";
 let expect = chai.expect;
 
 chai.use(chaiHttp);
 
 //Clean
-userSchemaModel.deleteMany({}).exec((data) => { });
+userModel.userSchemaModel.deleteMany({}).exec(() => { });
 
-let user_id, token;
+let user_id:string, token:string;
 
 describe('User', () => {
     it('create new user should fail', (done) => {
@@ -20,6 +19,7 @@ describe('User', () => {
             .post('/user')
             .send()
             .end(function(err, res) {
+                expect(err).to.be.a('null');
                 expect(res.body.isError).to.be.true;
                 expect(res).to.have.status(400);
                 done();
@@ -30,6 +30,7 @@ describe('User', () => {
             .post('/user')
             .send(userData)
             .end(function(err, res) {
+                expect(err).to.be.a('null');
                 expect(res.body.result).to.be.equal('OK');
                 expect(res.body.isError).to.be.false;
                 expect(res).to.have.status(200);
@@ -41,6 +42,7 @@ describe('User', () => {
         chai.request(server)
             .get('/user/' + user_id)
             .end(function(err, res) {
+                expect(err).to.be.a('null');
                 expect(res.body.result.firstName).to.be.equal(userData.firstName);
                 expect(res.body.isError).to.be.false;
                 expect(res).to.have.status(200);
@@ -52,6 +54,7 @@ describe('User', () => {
             .post('/user/auth')
             .send({ login: userData.login, password: userData.password })
             .end(function(err, res) {
+                expect(err).to.be.a('null');
                 expect(res.body.token).to.not.be.empty;
                 expect(res.body.isError).to.be.false;
                 expect(res).to.have.status(200);
@@ -67,6 +70,7 @@ describe('User', () => {
             .send(test_user)
             .set('Authorization', 'Bearer ' + token)
             .end(function(err, res) {
+                expect(err).to.be.a('null');
                 expect(res.body.result).to.not.be.empty;
                 expect(res.body.result.firstName).to.be.equal(test_user.firstName);
                 expect(res.body.isError).to.be.false;
@@ -81,6 +85,7 @@ describe('User', () => {
             .send({ password: userData.password })
             .set('Authorization', 'Bearer ' + token)
             .end(function(err, res) {
+                expect(err).to.be.a('null');
                 expect(res.body.result).to.be.true;
                 expect(res.body.isError).to.be.false;
                 expect(res).to.have.status(200);
@@ -92,6 +97,7 @@ describe('User', () => {
             .get('/user/logout')
             .set('Authorization', 'Bearer ' + token)
             .end(function(err, res) {
+                expect(err).to.be.a('null');
                 expect(res.body.result).to.be.true;
                 expect(res.body.isError).to.be.false;
                 expect(res).to.have.status(200);
