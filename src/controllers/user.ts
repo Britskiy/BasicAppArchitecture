@@ -2,21 +2,16 @@ const config = require("../config");
 //Web
 import express = require('express');
 import mongoose = require('mongoose');
-import expressValidator = require('express-validator');
-import bodyParser = require('body-parser');
 import jwt = require('express-jwt');
 //Helpers 
 import { Auth } from '../middlewares/auth';
 import { UserModel } from "../repositories/user";
 import { IUser } from "../interfaces/user";
 import randomstring = require("randomstring");
-import { DataBase } from "../helpers/db";
 
 let router = express.Router();
-let _ = require('lodash');
 
 router.post('/user/verifyToken', jwt({ secret: Auth.secretToken }), Auth.verifyToken, () => { });
-
 
 //Registration
 router.post('/', (req, res) => {
@@ -69,7 +64,7 @@ router.put('/', jwt({ secret: Auth.secretToken }), Auth.verifyToken, (req, res) 
             email: req.body.email,
             firstName: req.body.firstName,
             lastName: req.body.lastName,
-            _id: req['user'].id,
+            _id: (<any>req).user.id,
         };
 
         UserModel.update(user).then((result) => {
@@ -90,7 +85,7 @@ router.delete('/', jwt({ secret: Auth.secretToken }), Auth.verifyToken, (req, re
         if (!result.isEmpty()) {
             return res.status(400).send({ result: result.array(), isError: true });
         }
-        UserModel.deleteWithPasswordChecking(req.body.password, req['user'].id).then((result) => {
+        UserModel.deleteWithPasswordChecking(req.body.password, (<any>req).user.id).then((result) => {
             return res.status(200).send({ result, 'isError': false });
         }).catch((error) => {
             return res.status(200).send({ result: error, 'isError': true });

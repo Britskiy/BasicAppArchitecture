@@ -5,7 +5,7 @@ import { IUser } from "../interfaces/user";
 let Schema = mongoose.Schema;
 
 //Validation match
-let phone_match = [/[\+0-9]+/, "No phone number found ({VALUE})"];
+// let phone_match = [/[\+0-9]+/, "No phone number found ({VALUE})"];
 let email_match = [/([a-z0-9_\-\.])+@([a-z0-9_\-\.])+\.([a-z0-9])+/i, "No email found ({VALUE})"];
 /**
  * User schema for mangoose

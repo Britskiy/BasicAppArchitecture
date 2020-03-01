@@ -1,13 +1,11 @@
-
-import * as express from 'express';
-import * as mongoose from 'mongoose';
+const mongoose = require('mongoose');
 const config = require('../config');
 
 export class DataBase {
-    public static connection;
-    public static connect(config: any) {
+    public static connection:Promise<any>;
+    public static async connect(config: any) {
         (<any>mongoose).Promise = global.Promise;
-
+        //console.log(mongoose);
         if (mongoose.connection.readyState == 0) {
             mongoose.set('debug', config.debug);
             mongoose.set('useCreateIndex', true);

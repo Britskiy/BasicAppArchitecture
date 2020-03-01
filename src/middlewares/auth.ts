@@ -1,7 +1,8 @@
 
 import * as express from 'express';
-import jwt = require('express-jwt');
 import redis = require('redis');
+import { IncomingHttpHeaders } from 'http';
+
 
 const config = require("../config");
 
@@ -16,22 +17,20 @@ export class Auth {
         this.TOKEN_EXPIRATION_SEC = config.TOKEN_EXPIRATION * 60;
         this.secretToken = config.secretToken;
     }
-    public static getToken(headers): string {
+    public static getToken(headers:IncomingHttpHeaders): string {
         if (headers && headers.authorization) {
             var authorization = headers.authorization;
             var part = authorization.split(' ');
 
             if (part.length == 2) {
-                var token = part[1];
-
                 return part[1];
             }
             else {
-                return null;
+                return '';
             }
         }
         else {
-            return null;
+            return '';
         }
     };
 
@@ -63,7 +62,7 @@ export class Auth {
         });
     };
 
-    public static expireToken(headers): void {
+    public static expireToken(headers:IncomingHttpHeaders): void {
         var token = Auth.getToken(headers);
         if (token != null) {
             Auth.redisClient.set(token, "{ is_expired: true }");

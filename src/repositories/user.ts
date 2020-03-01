@@ -3,13 +3,11 @@ import * as bcrypt from 'bcrypt';
 
 import jwt = require('jsonwebtoken');
 
-import { model } from 'mongoose';
 import { userSchemaModel } from '../models/user';
 import { IUser } from '../interfaces/user';
 import { RepositoryBase } from "./base";
 import _ = require('lodash');
 const config = require("../config");
-import { simpleResponse } from "../helpers/convertors";
 
 import ObjectId = mongoose.Types.ObjectId;
 
@@ -53,7 +51,7 @@ export class UserModel {
             let repo = new UserRepository();
             repo.findOne({ _id: _id })
                 .select('firstName lastName login -_id')
-                .exec((err, res) => {
+                .exec((err, res:IUser) => {
                     if (err) {
                         reject(err);
                     }
@@ -69,12 +67,15 @@ export class UserModel {
             let repo = new UserRepository();
             repo.findOne({ login: login })
                 .select('password')
-                .exec((err, user) => {
+                .exec((err, user:IUser) => {
                     if (err) {
                         reject(err);
                     }
                     else {
                         repo.comparePassword(password, user.password, (err, isMatch) => {
+                            if(err)
+                                return reject(err);
+
                             let token = '';
                             //Good compare)
                             if (isMatch) {
@@ -96,13 +97,13 @@ export class UserModel {
             let repo = new UserRepository();
             repo.findOne({ _id: data._id })
                 .select('firstName lastName _id')
-                .exec((err, user) => {
+                .exec((err, user:IUser) => {
                     if (err) {
-                        reject(err);
+                        return reject(err);
                     }
                     else {
                         _.forEach(data, (value, key) => {
-                            user[key] = value;
+                            (<any>user)[key] = value;
                         });
                         user.save((err) => {
                             if (err)
@@ -125,20 +126,23 @@ export class UserModel {
         });
     }
 
-    static deleteWithPasswordChecking(password, _id: string): Promise<String> {
+    static deleteWithPasswordChecking(password: string, _id: string): Promise<String> {
         return new Promise((resolve: any, reject) => {
             let repo = new UserRepository();
 
             repo.findOne({ _id: _id })
                 .select('firstName lastName _id password')
-                .exec((err, user) => {
+                .exec((err, user:IUser) => {
                     if (err) {
-                        reject(err);
+                       return reject(err);
                     }
                     else {
                         repo.comparePassword(password, user.password, (err, isMatch) => {
+                            if (err) {
+                                return reject(err);
+                            }
                             if (isMatch) {
-                                repo.delete(_id, (err, result) => {
+                                repo.delete(_id, (err) => {
                                     if (err)
                                         return reject(err);
                                     return resolve(true);
