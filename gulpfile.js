@@ -58,7 +58,7 @@ gulp.task('tests', function() {
     del('./test/*.js');
 
     return gulp.src('./test/**/*.ts')
-        .pipe(typescript())
+        .pipe(tsProject())
         .pipe(gulp.dest('./test/'))
         .pipe(mocha({
             debugBrk: DEBUG,

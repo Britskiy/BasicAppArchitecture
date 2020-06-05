@@ -24,7 +24,8 @@
     "mocha": "5.2.0",
     "node": "8.17.0",
     "superagent": "^5.2.1",
-    "typescript": "^3.7.5"
+    "typescript": "^3.7.5",
+    "minimist": ">=0.2.1"
   },
   "description": "",
   "main": "dist/app.js",

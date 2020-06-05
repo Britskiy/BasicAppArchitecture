@@ -1,6 +1,11 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [0.0.3] - 2020-06-05
+### Changed
+- Update dependencies
+- Fix tests ts
+
 ## [0.0.3] - 2020-03-01
 ### Changed
 - Update mongoose & mocha packages
