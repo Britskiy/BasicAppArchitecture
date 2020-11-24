@@ -46,7 +46,7 @@
     "body-parser": "1.18.3",
     "dynamic-config": "1.0.0",
     "express": "4.16.3",
-    "express-jwt": "5.3.1",
+    "express-jwt": "6.0.0",
     "express-validator": "5.3.0",
     "jsonwebtoken": "8.3.0",
     "lodash": "^4.17.15",
