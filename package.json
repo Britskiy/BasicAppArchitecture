@@ -25,7 +25,8 @@
     "node": "8.17.0",
     "superagent": "^5.2.1",
     "typescript": "^3.7.5",
-    "minimist": ">=0.2.1"
+    "minimist": ">=0.2.1",
+    "yargs-parser": "^20.2.4"
   },
   "description": "",
   "main": "dist/app.js",
