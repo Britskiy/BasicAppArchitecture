@@ -1,6 +1,12 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [0.0.4] - 2020-11-25
+### Changed
+- Update dependencies
+- Fixed new typing requirements 
+- Refactor tests
+
 ## [0.0.3] - 2020-06-05
 ### Changed
 - Update dependencies
