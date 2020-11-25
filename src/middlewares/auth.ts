@@ -1,10 +1,8 @@
+const config = require("../config");
 
 import * as express from 'express';
 import redis = require('redis');
 import { IncomingHttpHeaders } from 'http';
-
-
-const config = require("../config");
 
 export class Auth {
 

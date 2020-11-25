@@ -34,7 +34,7 @@ describe('User', () => {
                 expect(res.body.result).to.be.equal('OK');
                 expect(res.body.isError).to.be.false;
                 expect(res).to.have.status(200);
-                user_id = res.body.id;
+                user_id = res.body._id;
                 done();
             });
     });

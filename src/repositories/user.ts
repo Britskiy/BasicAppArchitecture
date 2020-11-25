@@ -35,12 +35,12 @@ export class UserModel {
                 photo: data.email,
             };
 
-            repo.create(user, (err, res) => {
+            repo.create(user, (err, result:IUser | Promise<IUser> | any) => {
                 if (err) {
                     reject(err);
                 }
                 else {
-                    resolve(res);
+                    resolve(result);
                 }
             });
         });

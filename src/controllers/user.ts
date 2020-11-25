@@ -1,4 +1,3 @@
-const config = require("../config");
 //Web
 import express = require('express');
 import mongoose = require('mongoose');
@@ -11,7 +10,7 @@ import randomstring = require("randomstring");
 
 let router = express.Router();
 
-router.post('/user/verifyToken', jwt({ secret: Auth.secretToken }), Auth.verifyToken, () => { });
+router.post('/user/verifyToken', jwt({ secret: Auth.secretToken, algorithms: ['HS256'] }), Auth.verifyToken, () => { });
 
 //Registration
 router.post('/', (req, res) => {
@@ -42,19 +41,19 @@ router.post('/', (req, res) => {
         };
 
         UserModel.create(user).then((result) => {
-            return res.status(200).send({ result: "OK", 'isError': false, id: result._id });
+            return res.status(200).send({ result: "OK", 'isError': false, _id: result._id });
         });
     });
 });
 
 //update
-router.put('/', jwt({ secret: Auth.secretToken }), Auth.verifyToken, (req, res) => {
+router.put('/', jwt({ secret: Auth.secretToken, algorithms: ['HS256'] }), Auth.verifyToken, (req, res) => {
     req.checkBody('password', 'Invalid password').notEmpty();
     req.checkBody('email', 'Invalid email').notEmpty();
     req.checkBody('firstName', 'Invalid firstName');
     req.checkBody('lastName', 'Invalid lastName');
     req.checkHeaders('user.id', 'Invalid token');
-
+  
     req.getValidationResult().then((result) => {
         if (!result.isEmpty()) {
             return res.status(400).send({ result: result.array(), isError: true });
@@ -77,7 +76,7 @@ router.put('/', jwt({ secret: Auth.secretToken }), Auth.verifyToken, (req, res) 
 });
 
 //delete
-router.delete('/', jwt({ secret: Auth.secretToken }), Auth.verifyToken, (req, res) => {
+router.delete('/', jwt({ secret: Auth.secretToken, algorithms: ['HS256'] }), Auth.verifyToken, (req, res) => {
     req.checkBody('password', 'Invalid password').notEmpty();
     req.checkHeaders('user.id', 'Invalid token');
 
@@ -112,7 +111,7 @@ router.post('/auth', (req, res) => {
 });
 
 //Logout
-router.get('/logout', jwt({ secret: config.secretToken }), (req, res) => {
+router.get('/logout', jwt({ secret: Auth.secretToken, algorithms: ['HS256'] }), (req, res) => {
     req.checkHeaders('user.id', 'Invalid token');
     req.getValidationResult().then((result) => {
         if (!result.isEmpty()) {

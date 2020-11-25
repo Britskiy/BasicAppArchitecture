@@ -13,7 +13,7 @@ router.use('/user', require('./user'));
 
 router.use((err:any, req:Request, res:Response) => {
     const body = req.body;
-    console.log(body);
+
     if (err.name === 'UnauthorizedError') {
         return res.status(401).send('Invalid token');
     }
