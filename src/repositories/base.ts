@@ -9,7 +9,7 @@ export class RepositoryBase<T extends mongoose.Document> implements IRead<T>, IW
         this._model = schemaModel;
     }
 
-    create(item: mongoose.CreateQuery<T>, callback?: (err: any, res: T[]) => void)  {
+    create(item: mongoose.CreateQuery<T>, callback?: (err: any, res: T[]) => void):void  {
         this._model.create(item, callback);
     }
 
