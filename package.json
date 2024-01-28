@@ -44,7 +44,7 @@
     "@types/passport": "^1.0.2",
     "@types/randomstring": "^1.1.6",
     "bcrypt": "5.0.0",
-    "body-parser": "1.18.3",
+    "body-parser": "1.20.2",
     "dynamic-config": "1.0.0",
     "express": "4.17.3",
     "express-jwt": "6.0.0",
