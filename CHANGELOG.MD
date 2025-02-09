@@ -1,6 +1,12 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [0.0.5] - 2025-02-07
+### Changed
+- Update readme
+- Update dependencies & code
+- Fixed new typing requirements
+
 ## [0.0.4] - 2020-11-25
 ### Changed
 - Update dependencies

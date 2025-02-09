@@ -1,88 +1,40 @@
 const gulp = require('gulp');
-const del = require('del');
-const typescript = require('gulp-typescript');
-const tsProject = typescript.createProject('tsconfig.json');
+const { deleteSync } = require('del');
+const { spawn } = require('child_process');
+const ts = require('gulp-typescript');
 
-const DEBUG = process.env.NODE_ENV === 'debug',
-    CI = process.env.CI === 'true';
+const tsProject = ts.createProject('tsconfig.json');
 
-var mocha = require('gulp-spawn-mocha');
-var gutil = require('gulp-util');
-
-var spawn = require('child_process').spawn,
-    node;
-
-// let config = {
-//     "compilerOptions": {
-//         "module": "commonjs",
-//         "target": "es6",
-//         "outDir": "out",
-//         "lib": [ "es5","es2015", "es6",
-//         "dom"],
-//         "sourceMap": true,
-//         "rootDir": ".",
-//         "allowJs": true,
-//         "typeRoots": [
-//             "node_modules/@types"
-//         ],
-//         "types": [
-//             "node",
-//             "mocha"
-//         ]
-//     }
-// }
-
-function handleError(err) {
-    console.log(err.toString());
-    this.emit('end');
+function clean() {
+    return new Promise((resolve) => {
+        deleteSync(['dist/**/*']);
+        resolve();
+    });
 }
-// clean the contents of the distribution directory
-gulp.task('clean', function() {
-    return del('dist/**/*');
-});
 
-// clean the contents of the distribution directory
-gulp.task('clean_src', function() {
-    return del('src/**/*.js');
-});
-
-gulp.task('compile-tests-data', function() {
-    return gulp.src('test/**/*.ts')
+function compileTS() {
+    return gulp.src('src/**/*.ts') // ✅ Компилируем только `src/`, а не весь проект
         .pipe(tsProject())
-        .pipe(gulp.dest('./test/'))
-})
+        .pipe(gulp.dest('dist'));
+}
 
-//Mocha tests
-gulp.task('tests', function() {
-    
-    del('./test/*.js');
+function runTests(done) {
+    const mochaProcess = spawn('npx', ['mocha', '-r', 'ts-node/register', './test/**/*.ts', '--reporter', 'spec', '--exit'], {
+        stdio: 'inherit',
+        env: { ...process.env, NODE_ENV: 'test' }
+    });
 
-    return gulp.src('./test/**/*.ts')
-        .pipe(tsProject())
-        .pipe(gulp.dest('./test/'))
-        .pipe(mocha({
-            debugBrk: DEBUG,
-            exit: true,
-            env: { 'NODE_ENV': 'test' },
-            reporter: 'spec'
-    })).on('error', handleError).on('end', function() {
-        // у нас все закончилось успешно
-    }) 
-});
+    mochaProcess.on('close', (code) => {
+        if (code !== 0) {
+            console.error(`Mocha tests failed with exit code ${code}`);
+            done(new Error(`Test failed with exit code ${code}`));
+        } else {
+            done();
+        }
+    });
+}
 
-// TypeScript compile
-gulp.task('compile', function() {
-    return gulp.src('src/**/*.ts')
-    .pipe(tsProject())
-    .js.pipe(gulp.dest('./dist'));
-});
-
-// ADD for fix Mocha path
-gulp.task('dist', gulp.series('clean', 'clean_src'), function() {
-    return gulp.src('src/**/*.ts').pipe(tsProject()).pipe(gulp.dest('./dist'));
-});
-
-gulp.task('build', gulp.series('clean_src','clean','compile'));
-gulp.task('test', gulp.series('build', 'compile-tests-data', 'tests'));
+gulp.task('clean', clean);
+gulp.task('build', gulp.series('clean', compileTS));
+gulp.task('test', gulp.series(runTests));
 gulp.task('default', gulp.series('build'));
-//gulp.task('compile', ['handlebars']);

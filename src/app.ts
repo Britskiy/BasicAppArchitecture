@@ -1,31 +1,19 @@
-//Web
-import express = require('express');
-import expressValidator = require('express-validator');
-import bodyParser = require('body-parser');
-//Db
-import mongoose = require('mongoose');
+import express from 'express';
+import bodyParser from 'body-parser';
 import { DataBase } from './helpers/db';
-//Else
-const config = require("./config");
+import config from './config';
+import router from './controllers';
 
-let app = express();
+const app = express();
 DataBase.connect(config);
-app.use(bodyParser.urlencoded({ extended: false }))
-app.use(bodyParser.json())
 
-app.use(expressValidator({
-    customValidators: {
-        isObjectId: (value) => {
-            return mongoose.Types.ObjectId.isValid(value);
-        }
-    }
-}))
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
 
-app.use(require('./controllers'))
+app.use(router);
 
-//Run
-app.listen(config.app_port, function() {
-    console.log('Listening on port ' + config.app_port)
-})
+app.listen(config.app_port, () => {
+    console.log('Listening on port ' + config.app_port);
+});
 
-export = app;
+export default app;

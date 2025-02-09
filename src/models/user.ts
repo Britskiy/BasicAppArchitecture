@@ -1,49 +1,38 @@
-import * as mongoose from 'mongoose';
-import * as bcrypt from 'bcrypt';
-const config = require("../config");
+import mongoose from 'mongoose';
+import bcrypt from 'bcrypt';
 import { IUser } from "../interfaces/user";
-let Schema = mongoose.Schema;
+import randomstring from 'randomstring';
 
-//Validation match
-// let phone_match = [/[\+0-9]+/, "No phone number found ({VALUE})"];
-let email_match = [/([a-z0-9_\-\.])+@([a-z0-9_\-\.])+\.([a-z0-9])+/i, "No email found ({VALUE})"];
-/**
- * User schema for mangoose
- * @type {Schema}
- */
-let User = new Schema({
+const config = require("../config");
+
+const UserSchema = new mongoose.Schema<IUser>({
     login: { type: String, required: true },
     password: { type: String, required: true },
-    email: { type: String, match: email_match, unique: true },
-    firstName: { type: String },
-    lastName: { type: String },
-    photo: { type: String, default: 'no_image.png' },
-
-    parentId: { type: Schema.Types.ObjectId, ref: 'User', required: false, null: true, default: null },
-
+    email: {
+        type: String,
+        match: [/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/, 'Invalid email'],
+        unique: true
+    },
+    firstName: String,
+    lastName: String,
+    photo: { type: String, default: '' },
     money: { type: Number, default: 0, min: 0 },
-    //System fields
     createDate: { type: Date, default: Date.now },
     activated: { type: Boolean, default: false },
-    activateCode: { type: String, default: '' },
+    activateCode: { type: String, default: () => randomstring.generate(50) },
     passwordRecoveryCode: { type: String, default: '' }
 });
 
+UserSchema.pre<IUser>('save', async function(next) {
+    if (!this.isModified('password')) return next();
 
-// Bcrypt middleware on UserSchema
-User.pre('save', function(next) {
-    var user:IUser = (<IUser>this);
-    if (!user.isModified('password')) return next();
-
-    bcrypt.genSalt(config.SALT_WORK_FACTOR, (err, salt) => {
-        if (err) return next(err);
-        bcrypt.hash(user.password, salt, (err, hash) => {
-            if (err) return next(err);
-            user.password = hash;
-            return next();
-        });
-    });
+    try {
+        const salt = await bcrypt.genSalt(config.SALT_WORK_FACTOR);
+        this.password = await bcrypt.hash(this.password, salt);
+        next();
+    } catch (err: any) {
+        next(err);
+    }
 });
 
-export let userSchemaModel: mongoose.Model<IUser> = mongoose.model<IUser>('User', User);
-
+export const UserModel = mongoose.model<IUser>('User', UserSchema);

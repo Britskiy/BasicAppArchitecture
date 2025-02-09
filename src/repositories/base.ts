@@ -1,44 +1,35 @@
-import * as mongoose from 'mongoose';
+import { Model, FilterQuery, UpdateQuery, Document, Types } from 'mongoose';
 import { IRead, IWrite } from '../interfaces/base';
 
-export class RepositoryBase<T extends mongoose.Document> implements IRead<T>, IWrite<T> {
+export class RepositoryBase<T extends Document> implements IRead<T>, IWrite<T> {
+    protected _model: Model<T>;
 
-    private _model: mongoose.Model<T>;
-
-    constructor(schemaModel: mongoose.Model<T>) {
-        this._model = schemaModel;
+    constructor(model: Model<T>) {
+        this._model = model;
     }
 
-    create(item: mongoose.CreateQuery<T>, callback?: (err: any, res: T[]) => void):Promise<T>  {
-        return this._model.create(item, callback);
+    async create(item: Partial<T>): Promise<T> {
+        return this._model.create(item);
     }
 
-    retrieve(callback: (error: any, result: T) => void) {
-        this._model.find({}, callback);
+    async update(id: Types.ObjectId, item: UpdateQuery<T>): Promise<T | null> {
+        return this._model.findByIdAndUpdate(id, item, { new: true }).exec();
     }
 
-    update(_id: mongoose.Types.ObjectId, item: mongoose.UpdateQuery<T>, callback: (error: any, result: any) => void) {
-        this._model.update({ _id: _id } as mongoose.FilterQuery<T>, item, callback);
+    async delete(id: Types.ObjectId): Promise<boolean> {
+        const result = await this._model.deleteOne({ _id: id }).exec();
+        return result.deletedCount === 1;
     }
 
-    delete(_id: string, callback: (error: any, result: any) => void) {
-        this._model.deleteOne({ _id: this.toObjectId(_id) } as mongoose.FilterQuery<T>, (err) => callback(err, null));
+    async findById(id: Types.ObjectId): Promise<T | null> {
+        return this._model.findById(id).exec();
     }
 
-    findById(_id: string, callback: (error: any, result: mongoose.Model<T>) => void) {
-        this._model.findById(_id, callback);
+    async findOne(cond: FilterQuery<T> = {}): Promise<T | null> {
+        return this._model.findOne(cond).exec();
     }
 
-    findOne(cond?: Object, callback?: (err: any, res: mongoose.Model<T>) => void): mongoose.DocumentQuery<T | null, T> {
-        return this._model.findOne(cond as mongoose.FilterQuery<T>, callback);
+    async find(cond: FilterQuery<T> = {}): Promise<T[]> {
+        return this._model.find(cond).exec();
     }
-
-    find(cond?: any, options?: any, callback?: (err: any, res: T[]) => void): mongoose.DocumentQuery<T[],  T> {
-        return this._model.find(cond as mongoose.FilterQuery<T>, options, callback);
-    }
-
-    private toObjectId(_id: string): mongoose.Types.ObjectId {
-        return mongoose.Types.ObjectId.createFromHexString(_id);
-    }
-
 }

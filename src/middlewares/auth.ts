@@ -1,70 +1,53 @@
 const config = require("../config");
-
-import * as express from 'express';
-import redis = require('redis');
+import { Request, Response, NextFunction } from 'express';
 import { IncomingHttpHeaders } from 'http';
+import { createClient } from 'redis';
 
 export class Auth {
-
-    static redisClient = redis.createClient(config.redis_port);
+    static redisClient = createClient({ url: `redis://localhost:${config.redis_port}` });
     static TOKEN_EXPIRATION_SEC = config.TOKEN_EXPIRATION * 60;
     static secretToken = config.secretToken;
 
-    public static connect(config: any) {
-        this.redisClient = redis.createClient(config.redis_port);
-        this.TOKEN_EXPIRATION_SEC = config.TOKEN_EXPIRATION * 60;
-        this.secretToken = config.secretToken;
+    static async connect() {
+        if (!Auth.redisClient.isOpen) {
+            await Auth.redisClient.connect();
+        }
     }
-    public static getToken(headers:IncomingHttpHeaders): string {
-        if (headers && headers.authorization) {
-            var authorization = headers.authorization;
-            var part = authorization.split(' ');
 
-            if (part.length == 2) {
-                return part[1];
-            }
-            else {
-                return '';
-            }
-        }
-        else {
-            return '';
-        }
-    };
+    static getToken(headers: IncomingHttpHeaders): string {
+        const authorization = headers.authorization;
+        return authorization?.split(' ')[1] || '';
+    }
 
-    public static verifyTokenFromWeb(req: express.Request, res: express.Response): any {
-        var token = Auth.getToken(req.headers);
-        Auth.redisClient.get(token, (err, reply) => {
-            if (err)
-                return res.status(200).send({ isError: true, text: err });
-            else if (reply)
-                return res.status(200).send({ isError: true, text: 'no token found' });
-            else
-                return res.status(200).send({ isError: false, text: 'success' });
-        });
-    };
+    static verifyToken = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+        const token = Auth.getToken(req.headers);
 
-    public static verifyToken(req: express.Request, res: express.Response, next: any) {
-        var token = Auth.getToken(req.headers);
-        Auth.redisClient.get(token, function(err, reply) {
-            if (err) {
-                console.log(err);
-                return res.send(500);
-            }
+        try {
+            await Auth.connect();
+
+            const reply = await Auth.redisClient.get(token);
+
             if (reply) {
-                res.send(401);
+                res.sendStatus(401);
+                return;
             }
-            else {
-                next();
-            }
-        });
-    };
 
-    public static expireToken(headers:IncomingHttpHeaders): void {
-        var token = Auth.getToken(headers);
-        if (token != null) {
-            Auth.redisClient.set(token, "{ is_expired: true }");
-            Auth.redisClient.expire(token, Auth.TOKEN_EXPIRATION_SEC);
+            next();
+
+        } catch (err) {
+            console.error("❌ Redis Error:", err);
+            res.sendStatus(500);
+            return;
         }
     };
+
+    static async expireToken(headers: IncomingHttpHeaders) {
+        const token = Auth.getToken(headers);
+
+        if (token) {
+            await Auth.connect();
+            await Auth.redisClient.set(token, "{ is_expired: true }");
+            await Auth.redisClient.expire(token, Auth.TOKEN_EXPIRATION_SEC);
+        }
+    }
 }

@@ -1,4 +1,4 @@
-## Attempt to implement the correct application architecture
+## Project Architecture Implementation Guide
 This example represents one possible implementation of a business logic layer, and serve as the starting point in the training of forming the project structure.
 
 **Why "attempt" and not the final realization?**
@@ -13,13 +13,12 @@ The first thing to understand is that there are several so-called layers of your
 - **«Data layer»** - is responsible for specific transactions are allowed for the current model (table), for example basic CRUD.
 
 ### And why do I need this?
-This separation helps to better structure your code and avoid piling up logic. 
-Consider this example: user registration. Suppose we have a REST request from a user-defined fields, for simplicity we take the login / password. In this case, the layers will have the following roles: 
-- **Service layer** - forming data validity checking username, password as the text values (or other criteria) to clean debris from the data and generate a request to the business layer. 
-- **Business layer** - must obtain the "entrance", "clean" data manipulation to spend with them and call the model methods. 
-- **Data layer** just manages preservation / creation and other methods and do not know anything about the data itself. 
+This separation helps to better structure your code and avoid piling up logic.
+Consider this example: user registration. Suppose we have a REST request from a user-defined fields, for simplicity we take the login / password. In this case, the layers will have the following roles:
+- **Service layer** - forming data validity checking username, password as the text values (or other criteria) to clean debris from the data and generate a request to the business layer.
+- **Business layer** - must obtain the "entrance", "clean" data manipulation to spend with them and call the model methods.
+- **Data layer** just manages preservation / creation and other methods and do not know anything about the data itself.
 
-![alt text](https://image.ibb.co/hyoHOQ/Main.png)
 *Summarize it in a VERY simplified form*<br />
 **Service layer**: clears the data and generates a response from the business layer. <br />
 **Business layer**: performs all data manipulation: the criterion sampling, filters and other "business objectives". <br />
@@ -38,6 +37,11 @@ Make git clone or zip download and move to the directory
 ```
 sudo npm install -g gulp typescript
 npm install
+```
+## Usage
+```
+npm run build
+npm run start
 ```
 ## Tests
 Use mocha, chai and chai-http for test.

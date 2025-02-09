@@ -1,23 +1,23 @@
-import { Request, Response, Router } from "express";
+import { ErrorRequestHandler, NextFunction, Request, Response, Router } from "express";
+import userRouter from './user';
 
-declare module 'express-serve-static-core' {
-    interface Response {
-        error: (code: number, message: string) => Response;
-        success: (code: number, message: string, result: any) => Response
-    }
-}
+const router = Router();
+router.use('/user', userRouter);
 
-let router = Router();
-
-router.use('/user', require('./user'));
-
-router.use((err:any, req:Request, res:Response) => {
-    const body = req.body;
-    console.log(body);
-    
+const errorHandler: ErrorRequestHandler = (
+    err: any,
+    req: Request,
+    res: Response,
+    next: NextFunction
+) => {
     if (err.name === 'UnauthorizedError') {
-        return res.status(401).send('Invalid token');
+        res.status(401).send('Invalid token');
+        return;
     }
-});
 
-export = router;
+    next(err);
+};
+
+router.use(errorHandler);
+
+export default router;

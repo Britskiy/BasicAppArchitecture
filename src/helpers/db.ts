@@ -1,23 +1,29 @@
-const mongoose = require('mongoose');
-const config = require('../config');
+import mongoose from 'mongoose';
+import config from '../config';
 
 export class DataBase {
-    public static connection:Promise<any>;
-    public static async connect(config: any) {
-        (<any>mongoose).Promise = global.Promise;
+    public static connection: Promise<typeof mongoose> | null = null;
 
-        if (mongoose.connection.readyState == 0) {
-            mongoose.set('debug', config.debug);
-            mongoose.set('useCreateIndex', true);
-            mongoose.set('useNewUrlParser', true);
-            mongoose.set('useUnifiedTopology', true);
-            this.connection = mongoose.connect(config.mongoDB);
+    public static async connect(config: any): Promise<void> {
+        if (mongoose.connection.readyState !== 0) {
+            return;
         }
-        else
-            return this.connection;
+
+        mongoose.set('debug', config.debug);
+
+        try {
+            this.connection = mongoose.connect(config.mongoDB, {
+                autoCreate: true
+            });
+
+            await this.connection;
+        } catch (error) {
+            console.error('MongoDB Connection Error:', error);
+            process.exit(1);
+        }
     }
 
-    public static debug(debug: any) {
+    public static debug(debug: boolean) {
         mongoose.set('debug', debug);
     }
 }

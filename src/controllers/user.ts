@@ -1,143 +1,204 @@
-//Web
-import express = require('express');
-import mongoose = require('mongoose');
-import jwt = require('express-jwt');
-//Helpers 
+import express, { NextFunction, Request, Response } from 'express';
+import { expressjwt } from 'express-jwt';
+import { body, param, validationResult } from 'express-validator';
 import { Auth } from '../middlewares/auth';
-import { UserModel } from "../repositories/user";
-import { IUser } from "../interfaces/user";
-import randomstring = require("randomstring");
+import randomstring from "randomstring";
+import { UserModelHandler } from "../repositories/user";
+import mongoose from 'mongoose';
+import { IUser } from '../interfaces/user';
 
-let router = express.Router();
+const router = express.Router();
 
-router.post('/user/verifyToken', jwt({ secret: Auth.secretToken, algorithms: ['HS256'] }), Auth.verifyToken, () => { });
+router.get(
+    '/ping',
+    (req: Request, res: Response) => {
+        res.status(200).json({'ping': 'pong'});
+    }
+)
 
-//Registration
-router.post('/', (req, res) => {
+router.post(
+    '/verifyToken',
+    expressjwt({ secret: Auth.secretToken, algorithms: ['HS256'] }),
+    Auth.verifyToken,
+    (req: Request, res: Response) => {
+        res.status(200).json({ isValid: true });
+    }
+);
 
-    req.checkBody('login', 'Invalid login').notEmpty();
-    req.checkBody('password', 'Invalid password').notEmpty();
-    req.checkBody('email', 'Invalid email').notEmpty();
-    req.checkBody('firstName', 'Invalid firstName');
-    req.checkBody('lastName', 'Invalid lastName');
+router.post(
+    '/',
+    [
+        body('login').notEmpty().withMessage('Invalid login'),
+        body('password').notEmpty().withMessage('Invalid password'),
+        body('email').isEmail().withMessage('Invalid email'),
+        body('firstName').optional(),
+        body('lastName').optional()
+    ],
+    async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const errors = validationResult(req);
+            if (!errors.isEmpty()) {
+                res.status(400).json({ errors: errors.array(), isError: true });
+                return;
+            }
 
-    req.getValidationResult().then((result) => {
-        if (!result.isEmpty()) {
-            return res.status(400).send({ result: result.array(), isError: true });
+            const user = await UserModelHandler.create(<IUser>{
+                login: req.body.login,
+                password: req.body.password,
+                email: req.body.email,
+                firstName: req.body.firstName,
+                lastName: req.body.lastName,
+                photo: '',
+                money: 0,
+                createDate: new Date(),
+                activated: false,
+                activateCode: randomstring.generate(50),
+                passwordRecoveryCode: ''
+            });
+
+            res.status(200).json({
+                result: "OK",
+                isError: false,
+                _id: user._id
+            });
+
+        } catch (error) {
+            next(error);
         }
+    }
+);
 
-        let user = <IUser>{
-            login: req.body.login,
-            password: req.body.password,
-            email: req.body.email,
-            firstName: req.body.firstName,
-            lastName: req.body.lastName,
-            photo: '',
-            money: 0,
-            createDate: new Date(),
-            activated: false,
-            activateCode: randomstring.generate(50),
-            passwordRecoveryCode: ''
-        };
+router.put(
+    '/',
+    expressjwt({ secret: Auth.secretToken, algorithms: ['HS256'] }),
+    Auth.verifyToken,
+    [
+        body('password').notEmpty().withMessage('Invalid password'),
+        body('email').notEmpty().withMessage('Invalid email'),
+        body('firstName').optional(),
+        body('lastName').optional(),
+    ],
+    async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const userId = (req as any).auth.id;
+            if (!userId) {
+                res.status(400).json({ message: "Invalid token", isError: true });
+                return;
+            }
+            const errors = validationResult(req);
+            if (!errors.isEmpty()) {
+                res.status(400).json({ errors: errors.array(), isError: true });
+                return;
+            }
 
-        UserModel.create(user).then((result) => {
-            return res.status(200).send({ result: "OK", 'isError': false, _id: result._id });
-        });
-    });
-});
+            const user = {
+                email: req.body.email,
+                firstName: req.body.firstName,
+                lastName: req.body.lastName,
+                _id: (req as any).auth.id
+            };
 
-//update
-router.put('/', jwt({ secret: Auth.secretToken, algorithms: ['HS256'] }), Auth.verifyToken, (req, res) => {
-    req.checkBody('password', 'Invalid password').notEmpty();
-    req.checkBody('email', 'Invalid email').notEmpty();
-    req.checkBody('firstName', 'Invalid firstName');
-    req.checkBody('lastName', 'Invalid lastName');
-    req.checkHeaders('user.id', 'Invalid token');
-  
-    req.getValidationResult().then((result) => {
-        if (!result.isEmpty()) {
-            return res.status(400).send({ result: result.array(), isError: true });
+            const result = await UserModelHandler.update(user);
+            res.status(200).json({ result, isError: false });
+        } catch (error) {
+            next(error);
         }
+    }
+);
 
-        let user = <IUser>{
-            email: req.body.email,
-            firstName: req.body.firstName,
-            lastName: req.body.lastName,
-            _id: (<any>req).user.id,
-        };
+router.delete(
+    '/',
+    expressjwt({ secret: Auth.secretToken, algorithms: ['HS256'] }),
+    Auth.verifyToken,
+    [
+        body('password').notEmpty().withMessage('Invalid password'),
+    ],
+    async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const userId = (req as any).auth.id;
+            if (!userId) {
+                res.status(400).json({ message: "Invalid token", isError: true });
+                return;
+            }
+            const errors = validationResult(req);
+            if (!errors.isEmpty()) {
+                res.status(400).json({ errors: errors.array(), isError: true });
+                return;
+            }
 
-        UserModel.update(user).then((result) => {
-            return res.status(200).send({ result, 'isError': false });
-        }).catch((error) => {
-            return res.status(200).send({ result: error, 'isError': true });
-        });
-    })
-
-});
-
-//delete
-router.delete('/', jwt({ secret: Auth.secretToken, algorithms: ['HS256'] }), Auth.verifyToken, (req, res) => {
-    req.checkBody('password', 'Invalid password').notEmpty();
-    req.checkHeaders('user.id', 'Invalid token');
-
-    req.getValidationResult().then((result) => {
-        if (!result.isEmpty()) {
-            return res.status(400).send({ result: result.array(), isError: true });
+            const result = await UserModelHandler.deleteWithPasswordChecking(req.body.password, (req as any).auth.id);
+            res.status(200).json({ result, isError: false });
+        } catch (error) {
+            next(error);
         }
-        UserModel.deleteWithPasswordChecking(req.body.password, (<any>req).user.id).then((result) => {
-            return res.status(200).send({ result, 'isError': false });
-        }).catch((error) => {
-            return res.status(200).send({ result: error, 'isError': true });
-        });
-    })
+    }
+);
 
-});
+router.post(
+    '/auth',
+    [
+        body('login').notEmpty().withMessage('Invalid login'),
+        body('password').notEmpty().withMessage('Invalid password')
+    ],
+    async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const errors = validationResult(req);
+            if (!errors.isEmpty()) {
+                res.status(400).json({ errors: errors.array(), isError: true });
+                return;
+            }
 
-//Auth
-router.post('/auth', (req, res) => {
-    req.checkBody('login', 'Invalid login').notEmpty();
-    req.checkBody('password', 'Invalid password').notEmpty();
-    req.getValidationResult().then((result) => {
-        if (!result.isEmpty()) {
-            return res.status(400).send({ result: result.array(), isError: true });
+            const token = await UserModelHandler.auth(req.body.login, req.body.password);
+            res.status(200).json({ token, isError: false });
+        } catch (error) {
+            next(error);
         }
+    }
+);
 
-        UserModel.auth(req.body.login, req.body.password).then((token) => {
-            return res.status(200).send({ token: token, 'isError': false });
-        }).catch((error) => {
-            return res.status(200).send({ result: error, 'isError': true });
-        });
-    })
-});
+router.get(
+    '/logout',
+    expressjwt({ secret: Auth.secretToken, algorithms: ['HS256'] }),
+    async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const userId = (req as any).auth.id;
+            if (!userId) {
+                res.status(400).json({ message: "Invalid token", isError: true });
+                return;
+            }
+            const errors = validationResult(req);
+            if (!errors.isEmpty()) {
+                res.status(400).json({ errors: errors.array(), isError: true });
+                return;
+            }
 
-//Logout
-router.get('/logout', jwt({ secret: Auth.secretToken, algorithms: ['HS256'] }), (req, res) => {
-    req.checkHeaders('user.id', 'Invalid token');
-    req.getValidationResult().then((result) => {
-        if (!result.isEmpty()) {
-            return res.status(400).send({ result: result.array(), isError: true });
+            Auth.expireToken(req.headers);
+            res.status(200).json({ isError: false, result: true });
+        } catch (error) {
+            next(error);
         }
+    }
+);
 
-        Auth.expireToken(req.headers);
-        return res.status(200).send({ 'isError': false, 'result': true });
-    })
-});
+router.get(
+    '/:id',
+    [
+        param('id').notEmpty().withMessage('Invalid ID param').isMongoId().withMessage('Invalid ObjectId')
+    ],
+    async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const errors = validationResult(req);
+            if (!errors.isEmpty()) {
+                res.status(400).json({ errors: errors.array(), isError: true });
+                return;
+            }
 
-//Get public info
-router.get('/:id', (req, res) => {
-    req.checkParams('id', 'Invalid ID param').notEmpty().isObjectId();
-    req.getValidationResult().then((result) => {
-        if (!result.isEmpty()) {
-            return res.status(400).send({ result: result.array(), isError: true });
+            const result = await UserModelHandler.getPublicInfo(new mongoose.Types.ObjectId(req.params.id));
+            res.status(200).json({ result, isError: false });
+        } catch (error) {
+            next(error);
         }
+    }
+);
 
-        UserModel.getPublicInfo(new mongoose.Types.ObjectId(req.params.id)).then((result) => {
-            return res.status(200).send({ result: result, 'isError': false });
-        }).catch((error) => {
-            return res.status(200).send({ result: error, 'isError': true });
-        });
-    });
-});
-
-export = router;
-
+export default router;
