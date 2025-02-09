@@ -1,4 +1,23 @@
 ## Project Architecture Implementation Guide
+
+# 🏛 Project Architecture - A Relic of the Past
+> ⚠️ **Warning!** This project is an artifact of the past, preserved only as a tribute to my coding history. Proceed with caution! 🚧
+
+Once, this project was a beacon of structure and discipline in the chaotic world of backend development. Today, however, it stands as a **legacy monument**, a testament to a time before the elegance of **NestJS**.
+
+## 💀 Why Resurrect the Past?
+I've updated the libraries, but let's be honest—this is more of a **nostalgic challenge** than a practical necessity.  
+The code still breathes (barely), but the world has moved on. **And so should you!**
+
+## 🚀 A Call to Arms: Migrate to NestJS!
+If you're here looking for inspiration, let me save you some time:  
+✨ **Use [NestJS](https://nestjs.com)** instead.  
+NestJS has already solved the issues I tried to address in this project, and does it **better, faster, stronger**.
+
+But if you're feeling **brave** (or just love archeology), feel free to dive into this historical codebase. Just don't say I didn't warn you. 🏴‍☠️
+
+---
+
 This example represents one possible implementation of a business logic layer, and serve as the starting point in the training of forming the project structure.
 
 **Why "attempt" and not the final realization?**
